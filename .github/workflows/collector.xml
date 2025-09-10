@@ -1,0 +1,31 @@
+name: GitHub Data Collector
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch and Store Data
+        run: node ./scripts/fetch.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} # A Personal Access Token with 'repo', 'user' scopes
+          TIDB_HOST: ${{ secrets.TIDB_HOST }}
+          TIDB_USER: ${{ secrets.TIDB_USER }}
+          TIDB_PASSWORD: ${{ secrets.TIDB_PASSWORD }}
+          TIDB_DATABASE: ${{ secrets.TIDB_DATABASE }}
+          GITHUB_USERNAME: 'your-github-username' # The user to fetch data for
